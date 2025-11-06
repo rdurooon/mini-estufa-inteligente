@@ -1,14 +1,54 @@
 <!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <title>Mini Estufa Inteligente</title>
-    <link rel="icon" type="image/png" href="icon.png">
-</head>
-<body>
-    Olá mundo!
-    <script src="main.js"></script>
-</body>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./style.css" />
+    <title>CONTROLE_ESTUFA</title>
+  </head>
+  <body>
+    <header>Painel de Controle</header>
+
+    <main class="ciaxa-principal">
+      <section class="section-control">
+        <h2>Controle da Estufa</h2>
+        <div class="control-buttons">
+          <button id="btn-estufa" class="off">Modo Automático</button>
+          <button id="btn-luz" class="off">Ligar Iluminação</button>
+          <button id="btn-fans" class="off">Ligar Ventilação</button>
+          <button id="btn-regar" class="off">Ligar Regadores</button>
+        </div>
+      </section>
+
+      <section class="section-status">
+        <h2>Status Atual</h2>
+        <div class="status-info">
+          <p>
+            Estufa:
+            <span id="state-estufa" class="status-indicator off"
+              >Desligada</span
+            >
+          </p>
+
+          <p>
+            Iluminação:
+            <span id="state-luz" class="status-indicator off">Desligada</span>
+          </p>
+
+          <p>
+            Ventilação (Fans):
+            <span id="state-fans" class="status-indicator off">Desligada</span>
+          </p>
+
+          <p>
+            Regadores:
+            <span id="state-regar" class="status-indicator off"
+              >Desligado</span
+            >
+          </p>
+        </div>
+      </section>
+    </main>
+    <script src="./main.js"></script>
+  </body>
 </html>

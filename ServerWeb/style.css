@@ -1,0 +1,110 @@
+/* Reset básico */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: #eef2f3;
+  color: #333;
+}
+
+/* Cabeçalho */
+header {
+  background: #4caf50;
+  color: white;
+  text-align: center;
+  padding: 1rem 0;
+  font-size: 1.4rem;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+}
+
+/* Área principal */
+.ciaxa-principal {
+  max-width: 900px;
+  margin: auto;
+  padding: 0 1rem;
+  display: grid;
+  gap: 2rem;
+}
+
+/* Seções */
+.section-control,
+.section-status {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.section-control h2,
+.section-status h2 {
+  margin-bottom: 1rem;
+  color: #333;
+  font-size: 1.2rem;
+}
+
+/* Botões */
+.control-buttons {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+button {
+  flex: 1;
+  padding: 0.8rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: 0.2s;
+  color: white;
+}
+
+/* Estado ligado (ativo) */
+button.on {
+  background: #e53935; /* vermelho */
+}
+
+/* Estado desligado (padrão) */
+button.off {
+  background: #4caf50; /* verde */
+}
+
+/* Botão desativado (quando for aplicar no futuro para modo automático) */
+button.disabled {
+  background: #bdbdbd !important;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Status */
+.status-info p {
+  margin: 0.4rem 0;
+  font-size: 1rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Estado visual dos status */
+.status-indicator.on {
+  color: #4caf50; /* Verde (Desligado) */
+  font-weight: bold;
+}
+
+.status-indicator.off {
+  color: #e53935; /* Vermelho (Ligado) */
+  font-weight: bold;
+}
+
+/* Responsividade */
+@media (max-width: 500px) {
+  button {
+    font-size: 0.9rem;
+    padding: 0.7rem;
+  }
+}
