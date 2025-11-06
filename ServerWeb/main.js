@@ -1,4 +1,19 @@
-console.log("Script vinculado!")
+console.log("Script vinculado!");
+
+function mostrarToast(mensagem, tipo = "success") {
+  const container = document.getElementById("toast-container");
+  const toast = document.createElement("div");
+  toast.classList.add("toast", tipo);
+  toast.textContent = mensagem;
+
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.opacity = "0";
+    toast.style.transform = "translateY(-10px)";
+    setTimeout(() => toast.remove(), 300);
+  }, 2500);
+}
 
 function configurarBotao(idBotao, nome, idEstadoTexto) {
   let ligado = false;
@@ -10,25 +25,20 @@ function configurarBotao(idBotao, nome, idEstadoTexto) {
 
     if (ligado) {
       btn.textContent = `Desligar ${nome}`;
-      btn.classList.remove("off");
-      btn.classList.add("on");
+      btn.classList.replace("off", "on");
 
-      estadoElemento.textContent = nome === "Regadores" ? "Ligados" : "Ligado";
-      estadoElemento.classList.remove("off");
-      estadoElemento.classList.add("on");
+      estadoElemento.textContent = "Ligado";
+      estadoElemento.classList.replace("off", "on");
 
-      // fetch(`/ligar_${idBotao}`);
+      mostrarToast(`${nome} ligado ✅`, "success");
     } else {
       btn.textContent = `Ligar ${nome}`;
-      btn.classList.remove("on");
-      btn.classList.add("off");
+      btn.classList.replace("on", "off");
 
-      estadoElemento.textContent =
-        nome === "Regadores" ? "Desligados" : "Desligado";
-      estadoElemento.classList.remove("on");
-      estadoElemento.classList.add("off");
+      estadoElemento.textContent = "Desligado";
+      estadoElemento.classList.replace("on", "off");
 
-      // fetch(`/desligar_${idBotao}`);
+      mostrarToast(`${nome} desligado ❌`, "alert");
     }
   });
 }

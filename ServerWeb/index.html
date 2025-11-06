@@ -7,8 +7,10 @@
     <title>CONTROLE_ESTUFA</title>
   </head>
   <body>
-    <header>Painel de Controle</header>
-
+    <header class="header-logo">
+      <img src="./logo.png" alt="Logo do Projeto" />
+      <span>Painel de Controle</span>
+    </header>
     <main class="ciaxa-principal">
       <section class="section-control">
         <h2>Controle da Estufa</h2>
@@ -42,13 +44,12 @@
 
           <p>
             Regadores:
-            <span id="state-regar" class="status-indicator off"
-              >Desligado</span
-            >
+            <span id="state-regar" class="status-indicator off">Desligado</span>
           </p>
         </div>
       </section>
     </main>
+    <div id="toast-container"></div>
     <script src="./main.js"></script>
   </body>
 </html>
