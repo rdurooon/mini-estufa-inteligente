@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,11 +11,28 @@
       <img src="./logo.png" alt="Logo do Projeto" />
       <span>Painel de Controle</span>
     </header>
+
+    <!-- MENU DE NAVEGAÇÃO -->
+    <nav class="menu">
+      <a href="index.html" class="active">Controle</a>
+      <a href="status.html">Status & Relatórios</a>
+    </nav>
+
     <main class="ciaxa-principal">
       <section class="section-control">
         <h2>Controle da Estufa</h2>
+
+        <!-- SWITCH MODO AUTOMÁTICO -->
+        <div class="auto-mode-row">
+          <span>Modo Automático</span>
+          <label class="switch">
+            <input type="checkbox" id="auto-switch" />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <!-- BOTÕES MANUAIS -->
         <div class="control-buttons">
-          <button id="btn-estufa" class="off">Modo Automático</button>
           <button id="btn-luz" class="off">Ligar Iluminação</button>
           <button id="btn-fans" class="off">Ligar Ventilação</button>
           <button id="btn-regar" class="off">Ligar Regadores</button>
@@ -25,13 +42,6 @@
       <section class="section-status">
         <h2>Status Atual</h2>
         <div class="status-info">
-          <p>
-            Estufa:
-            <span id="state-estufa" class="status-indicator off"
-              >Desligada</span
-            >
-          </p>
-
           <p>
             Iluminação:
             <span id="state-luz" class="status-indicator off">Desligada</span>
@@ -49,7 +59,10 @@
         </div>
       </section>
     </main>
+
     <div id="toast-container"></div>
+
+    <!-- scripts -->
     <script src="./main.js"></script>
   </body>
 </html>
