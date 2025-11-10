@@ -1,6 +1,6 @@
 console.log("Script vinculado!");
 
-// ======= VARIÁVEIS GLOBAIS DO MODO AUTOMÁTICO =======
+// ======= VARIÁVEIS GLOBAIS =======
 let modoAutomatico = localStorage.getItem("modoAutomatico") === "true";
 let parametrosAutomatico = JSON.parse(
   localStorage.getItem("parametrosAutomatico")
@@ -18,55 +18,36 @@ const manualButtons = [
   document.getElementById("btn-regar"),
 ];
 const btnMaster = document.getElementById("btn-estufa-master");
+const popup = document.getElementById("popup-parametros");
 
-// ======= RESTAURAR ESTADO AO CARREGAR =======
+// ======= RESTAURAR ESTADO =======
 if (modoAutomatico) {
   switchAuto.checked = true;
+  aplicarModoAutomatico();
+}
 
-  btnMaster.style.display = "none"; // Apenas o botão mestre some
-
+// ======= FUNÇÕES =======
+function aplicarModoAutomatico() {
+  btnMaster.style.display = "none";
   manualButtons.forEach((btn) => {
     btn.disabled = true;
     btn.classList.add("disabled");
   });
 }
 
-// ======= EVENTO SWITCH AUTOMÁTICO =======
-switchAuto.addEventListener("change", () => {
-  modoAutomatico = switchAuto.checked;
+function aplicarModoManual() {
+  btnMaster.style.display = "block";
+  manualButtons.forEach((btn) => {
+    btn.disabled = false;
+    btn.classList.remove("disabled");
+  });
+}
 
-  // Salva estado do modo (persistência)
-  localStorage.setItem("modoAutomatico", modoAutomatico);
-
-  if (modoAutomatico) {
-    btnMaster.style.display = "none";
-
-    manualButtons.forEach((btn) => {
-      btn.disabled = true;
-      btn.classList.add("disabled");
-    });
-
-    mostrarToast("Modo Automático ativado 🌿", "success");
-    abrirPopupParametros(true); // <-- TRUE para indicar abertura manual
-  } else {
-    btnMaster.style.display = "block";
-
-    manualButtons.forEach((btn) => {
-      btn.disabled = false;
-      btn.classList.remove("disabled");
-    });
-
-    mostrarToast("Modo Automático desativado", "alert");
-  }
-});
-
-// ======= TOASTS =======
 function mostrarToast(mensagem, tipo = "success") {
   const container = document.getElementById("toast-container");
   const toast = document.createElement("div");
   toast.classList.add("toast", tipo);
   toast.textContent = mensagem;
-
   container.appendChild(toast);
 
   setTimeout(() => {
@@ -76,6 +57,45 @@ function mostrarToast(mensagem, tipo = "success") {
   }, 2500);
 }
 
+// ======= EVENTO MODO AUTOMÁTICO =======
+switchAuto.addEventListener("change", () => {
+  if (switchAuto.checked) {
+    // Ainda NÃO ativa o modo — apenas abre o popup
+    popup.style.display = "flex";
+  } else {
+    modoAutomatico = false;
+    localStorage.setItem("modoAutomatico", false);
+    aplicarModoManual();
+    mostrarToast("Modo Automático desativado", "alert");
+  }
+});
+
+// ======= POPUP =======
+document.getElementById("cancel-popup").onclick = () => {
+  popup.style.display = "none";
+  switchAuto.checked = false;
+};
+
+document.getElementById("save-popup").onclick = () => {
+  parametrosAutomatico = {
+    tempMax: parseFloat(document.getElementById("temp-limite").value),
+    umidSoloMin: parseFloat(document.getElementById("umid-solo-limite").value),
+    lumMin: parseFloat(document.getElementById("lum-limite").value),
+  };
+
+  localStorage.setItem(
+    "parametrosAutomatico",
+    JSON.stringify(parametrosAutomatico)
+  );
+
+  // Agora sim ativamos o modo automático
+  modoAutomatico = true;
+  localStorage.setItem("modoAutomatico", true);
+  aplicarModoAutomatico();
+  popup.style.display = "none";
+  mostrarToast("Modo Automático ativado 🌿", "success");
+};
+
 // ======= BOTÕES INDIVIDUAIS =======
 function configurarBotao(idBotao, nome, idEstadoTexto, textoOn, textoOff) {
   let ligado = false;
@@ -83,7 +103,7 @@ function configurarBotao(idBotao, nome, idEstadoTexto, textoOn, textoOff) {
   const estadoElemento = document.getElementById(idEstadoTexto);
 
   btn.addEventListener("click", () => {
-    ligado = !ligado;
+    ligado = btn.classList.contains("on") ? false : true;
 
     btn.textContent = ligado ? textoOn : textoOff;
     btn.classList.toggle("on", ligado);
@@ -122,84 +142,61 @@ configurarBotao(
   "Ligar Regadores"
 );
 
-// ======= BOTÃO MESTRE =======
+// ======= BOTÃO MESTRE (CORRIGIDO SEM REPLACE) =======
+let estufaLigada = false; // Estado real da estufa
+
 btnMaster.addEventListener("click", () => {
-  const ligarTudo = btnMaster.classList.contains("off");
+  estufaLigada = !estufaLigada; // alterna o estado
 
-  btnMaster.textContent = ligarTudo ? "Desligar Estufa" : "Ligar Estufa";
-  btnMaster.classList.toggle("off", !ligarTudo);
-  btnMaster.classList.toggle("on", ligarTudo);
+  // Atualiza o botão mestre
+  btnMaster.textContent = estufaLigada ? "Desligar Estufa" : "Ligar Estufa";
+  btnMaster.classList.toggle("on", estufaLigada);
+  btnMaster.classList.toggle("off", !estufaLigada);
 
-  ["luz", "fans", "regar"].forEach((item) => {
-    const btn = document.getElementById(`btn-${item}`);
-    const estado = document.getElementById(`state-${item}`);
+  // Atualiza luz, ventilação e regadores
+  [
+    { id: "luz", nome: "Iluminação" },
+    { id: "fans", nome: "Ventilação" },
+    { id: "regar", nome: "Regadores" },
+  ].forEach(({ id, nome }) => {
+    const btn = document.getElementById(`btn-${id}`);
+    const estado = document.getElementById(`state-${id}`);
 
-    btn.classList.toggle("on", ligarTudo);
-    btn.classList.toggle("off", !ligarTudo);
+    btn.classList.toggle("on", estufaLigada);
+    btn.classList.toggle("off", !estufaLigada);
 
-    btn.textContent = ligarTudo
-      ? btn.textContent.replace("Ligar", "Desligar")
-      : btn.textContent.replace("Desligar", "Ligar");
+    btn.textContent = estufaLigada ? `Desligar ${nome}` : `Ligar ${nome}`;
 
-    estado.textContent = ligarTudo ? "Ligada" : "Desligada";
-    estado.classList.toggle("on", ligarTudo);
-    estado.classList.toggle("off", !ligarTudo);
+    estado.textContent = estufaLigada ? "Ligada" : "Desligada";
+    estado.classList.toggle("on", estufaLigada);
+    estado.classList.toggle("off", !estufaLigada);
   });
 
-  mostrarToast(ligarTudo ? "Estufa ligada ✅" : "Estufa desligada ❌");
+  mostrarToast(estufaLigada ? "Estufa ligada ✅" : "Estufa desligada ❌");
 });
 
-// ======= POP-UP PARÂMETROS =======
-function abrirPopupParametros(aberturaManual = false) {
-  let popup = document.getElementById("popup-parametros");
-  if (!popup) return;
+// ======= ATUALIZAÇÃO DE STATUS =======
+function updateUI(data) {
+  const temp = document.getElementById("temp-value");
+  const umAr = document.getElementById("umid-ar-value");
+  const umSolo = document.getElementById("umid-solo-value");
+  const lum = document.getElementById("lum-value");
 
-  // Só mostra popup se o usuário ativou manualmente
-  if (aberturaManual) popup.style.display = "flex";
+  if (temp) temp.textContent = `${data.temperatura} °C`;
+  if (umAr) umAr.textContent = `${data.umidadeAr} %`;
+  if (umSolo) umSolo.textContent = `${data.umidadeSolo} %`;
+  if (lum) lum.textContent = `${data.luminosidade} lx`;
+}
 
-  document.getElementById("cancel-popup").onclick = () => {
-    popup.style.display = "none";
-    switchAuto.checked = false;
-    switchAuto.dispatchEvent(new Event("change"));
-  };
-
-  document.getElementById("save-popup").onclick = () => {
-    parametrosAutomatico = {
-      tempMax: parseFloat(document.getElementById("temp-limite").value),
-      umidSoloMin: parseFloat(
-        document.getElementById("umid-solo-limite").value
-      ),
-      lumMin: parseFloat(document.getElementById("lum-limite").value),
+// ======= SIMULAÇÃO TEMPORÁRIA =======
+if (document.getElementById("temp-value")) {
+  setInterval(() => {
+    const fakeData = {
+      temperatura: (20 + Math.random() * 6).toFixed(1),
+      umidadeAr: (50 + Math.random() * 10).toFixed(0),
+      umidadeSolo: (35 + Math.random() * 20).toFixed(0),
+      luminosidade: (250 + Math.random() * 200).toFixed(0)
     };
-
-    localStorage.setItem(
-      "parametrosAutomatico",
-      JSON.stringify(parametrosAutomatico)
-    );
-    popup.style.display = "none";
-    mostrarToast("Parâmetros salvos ✅", "success");
-  };
-}
-
-// ======= GRÁFICOS =======
-const labels = ["00h", "04h", "08h", "12h", "16h", "20h", "24h"];
-const tempData = [22, 24, 25, 28, 27, 23, 21];
-const soloData = [40, 38, 42, 47, 50, 45, 41];
-const lumData = [200, 600, 900, 1200, 1000, 400, 150];
-
-function criarGrafico(id, label, data) {
-  return new Chart(document.getElementById(id), {
-    type: "line",
-    data: {
-      labels,
-      datasets: [{ label, data, borderWidth: 2, tension: 0.4, pointRadius: 3 }],
-    },
-    options: { responsive: true, maintainAspectRatio: false },
-  });
-}
-
-if (document.getElementById("chartTemp")) {
-  criarGrafico("chartTemp", "Temperatura (°C)", tempData);
-  criarGrafico("chartSolo", "Umidade do Solo (%)", soloData);
-  criarGrafico("chartLum", "Luminosidade (lx)", lumData);
+    updateUI(fakeData);
+  }, 1500);
 }

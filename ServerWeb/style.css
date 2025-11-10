@@ -34,30 +34,38 @@ body {
 .menu {
   display: flex;
   justify-content: center;
-  gap: 20px;
-  background: #ffffff;
-  padding: 10px 0;
-  border-bottom: 1px solid #e6efe6;
+  gap: 12px;
+  margin: 12px 0;
 }
 
 .menu a {
-  color: #2f5d3a;
   text-decoration: none;
-  font-size: 15px;
-  font-weight: 600;
-  padding: 8px 12px;
+  padding: 8px 14px;
   border-radius: 8px;
-  transition: 0.18s;
+  font-weight: 500;
+  transition: 0.25s;
+  background: #e8f6e5; /* cor suave neutra */
+  color: #2a4d2c;
+  border: 1px solid #b9d7b5;
 }
 
+/* quando passar o mouse */
 .menu a:hover {
-  background: #e8f7ea;
+  background: #d2edcd;
+  transform: translateY(-1px);
 }
 
+/* aba ativa */
 .menu a.active {
-  background: #3fa34d;
-  color: #fff;
-  box-shadow: 0 2px 8px rgba(63, 163, 77, 0.18);
+  background: #4caf50;
+  color: white;
+  border-color: #3f8d44;
+  font-weight: 600;
+}
+
+.menu a::before {
+  content: "• "; /* símbolo simples */
+  opacity: 0.55;
 }
 
 /* Contêineres principais */
@@ -212,7 +220,6 @@ button.disabled {
   color: #1f4f2e; /* antes estava #ccc */
 }
 
-
 #period-select {
   width: 230px;
   padding: 8px 10px;
@@ -362,7 +369,7 @@ button.disabled {
   inset: 0;
   background: #d5e6d5;
   border-radius: 34px;
-  transition: .3s;
+  transition: 0.3s;
 }
 
 .slider:before {
@@ -374,7 +381,7 @@ button.disabled {
   bottom: 3px;
   background: #fff;
   border-radius: 50%;
-  transition: .3s;
+  transition: 0.3s;
 }
 
 /* ON */
@@ -392,7 +399,7 @@ input:checked + .slider:before {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.45);
+  background: rgba(0, 0, 0, 0.45);
   display: none;
   justify-content: center;
   align-items: center;
@@ -405,7 +412,7 @@ input:checked + .slider:before {
   border-radius: 12px;
   max-width: 380px;
   width: 90%;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
 }
 
 .popup-content h3 {
