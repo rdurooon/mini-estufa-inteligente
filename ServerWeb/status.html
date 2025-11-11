@@ -46,7 +46,6 @@
         </div>
       </div>
 
-      <!-- substituímos o HR pela DIVISÓRIA SUAVE -->
       <div class="divider"></div>
 
       <section class="reports">
@@ -55,20 +54,11 @@
         <label for="period-select" class="select-label">Período:</label>
         <select id="period-select">
           <option>Últimas 24h</option>
-          <option>Últimos 7 dias</option>
           <option>Último mês</option>
-          <option>Período personalizado</option>
         </select>
 
         <div class="charts">
-          <h3>Temperatura</h3>
-          <canvas id="chartTemp"></canvas>
-
-          <h3>Umidade do Solo</h3>
-          <canvas id="chartSolo"></canvas>
-
-          <h3>Luminosidade</h3>
-          <canvas id="chartLum"></canvas>
+          <canvas id="chartGeral"></canvas>
         </div>
 
         <button id="btn-download-pdf" class="download-btn">
@@ -77,6 +67,6 @@
       </section>
     </main>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="./main.js"></script>=
+    <script src="./main.js"></script>
   </body>
 </html>
