@@ -44,7 +44,7 @@ body {
   border-radius: 8px;
   font-weight: 500;
   transition: 0.25s;
-  background: #e8f6e5; /* cor suave neutra */
+  background: #e8f6e5;
   color: #2a4d2c;
   border: 1px solid #b9d7b5;
 }
@@ -64,16 +64,42 @@ body {
 }
 
 .menu a::before {
-  content: "• "; /* símbolo simples */
+  content: "• ";
   opacity: 0.55;
 }
 
 /* Contêineres principais */
+.menu {
+  max-width: 1200px;
+  margin: 12px auto;
+  padding: 0 20px;
+}
+
 .ciaxa-principal,
 .status-container {
-  max-width: 1100px;
+  max-width: 1200px;
   margin: 22px auto;
-  padding: 0 16px;
+  padding: 0 20px;
+}
+
+@media (max-width: 900px) {
+  .menu {
+    padding: 0 15px;
+  }
+  .ciaxa-principal,
+  .status-container {
+    padding: 0 15px;
+  }
+}
+
+@media (max-width: 600px) {
+  .menu {
+    padding: 0 10px;
+  }
+  .ciaxa-principal,
+  .status-container {
+    padding: 0 10px;
+  }
 }
 
 /* Cards principais (Controle / Status) */
@@ -403,7 +429,7 @@ input:checked + .slider:before {
   display: none;
   justify-content: center;
   align-items: center;
-  z-index: 9999;
+  z-index: 10001;
 }
 
 .popup-content {
@@ -456,4 +482,139 @@ input:checked + .slider:before {
 #save-popup {
   background: #3fa34d;
   color: #fff;
+}
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  z-index: 10000;
+  color: white;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #4caf50;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* ===== BOTÃO DE AJUDA E MODAL ===== */
+.help-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #1f4f2e;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.help-button:hover {
+  background: #173d24;
+}
+
+.help-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+}
+.help-modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 400px;
+  width: 90%;
+  text-align: left;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+}
+.help-modal-content h3 {
+  margin-bottom: 15px;
+  color: #1f4f2e;
+}
+.help-modal-content ul {
+  list-style: disc;
+  padding-left: 20px;
+  margin-bottom: 20px;
+}
+.help-modal-content li {
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+#close-help {
+  background: #ccc;
+  color: #1a1a1a;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  float: right;
+}
+#close-help:hover {
+  background: #aaa;
+}
+
+/* ================================================
+   BOTÃO DE TEMA (🌙/☀️) - EM BREVE
+================================================ */
+.theme-toggle {
+  position: absolute;
+  top: 10px;
+  right: 50px;
+  background: #2c5935;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.theme-toggle:hover {
+  background: #204329;
+  transform: scale(1.07);
+}
+
+/* Animação suave de tema */
+html {
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.dark-theme {
+  color-scheme: dark;
 }

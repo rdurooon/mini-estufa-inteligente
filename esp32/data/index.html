@@ -3,35 +3,53 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Estilos -->
     <link rel="stylesheet" href="./style.css" />
-    <title>SIA - Página inicial</title>
+    <link rel="icon" href="./img/favicon.ico" type="image/x-icon" />
+
+    <title>CONTROLE_ESTUFA</title>
   </head>
+
   <body>
+    <!-- ============================================================
+         HEADER / LOGO
+    ============================================================ -->
     <header class="header-logo">
-      <img src="./logo.png" alt="Logo do Projeto" />
+      <img src="./img/logo.png" alt="Logo do Projeto" />
       <span>Painel de Controle</span>
+
+      <button id="btn-help" class="help-button">?</button>
+      <button id="theme-toggle" class="theme-toggle">🌙</button>
     </header>
 
-    <!-- MENU DE NAVEGAÇÃO -->
+    <!-- ============================================================
+         MENU DE NAVEGAÇÃO
+    ============================================================ -->
     <nav class="menu">
       <a href="index.html" class="active">Controle</a>
       <a href="status.html">Status & Relatórios</a>
     </nav>
 
+    <!-- ============================================================
+         CONTEÚDO PRINCIPAL
+    ============================================================ -->
     <main class="ciaxa-principal">
+      <!-- ======================== CONTROLE MANUAL E AUTOMÁTICO ======================== -->
       <section class="section-control">
         <h2>Controle da Estufa</h2>
 
-        <!-- SWITCH MODO AUTOMÁTICO -->
+        <!-- Switch do modo automático -->
         <div class="auto-mode-row">
           <span>Modo Automático</span>
+
           <label class="switch">
             <input type="checkbox" id="auto-switch" />
             <span class="slider"></span>
           </label>
         </div>
 
-        <!-- BOTÕES MANUAIS -->
+        <!-- Botões principais -->
         <div class="control-buttons">
           <button id="btn-estufa-master" class="off">Ligar Estufa</button>
           <button id="btn-luz" class="off">Ligar Iluminação</button>
@@ -40,8 +58,10 @@
         </div>
       </section>
 
+      <!-- ======================== STATUS RESUMIDO ======================== -->
       <section class="section-status">
         <h2>Status Atual</h2>
+
         <div class="status-info">
           <p>
             Iluminação:
@@ -60,6 +80,10 @@
         </div>
       </section>
     </main>
+
+    <!-- ============================================================
+         POPUP DE CONFIGURAÇÕES DO MODO AUTOMÁTICO
+    ============================================================ -->
     <div id="popup-parametros" class="popup">
       <div class="popup-content">
         <h3>Configurar Modo Automático</h3>
@@ -86,9 +110,67 @@
       </div>
     </div>
 
+    <!-- ============================================================
+         MODAL DE AJUDA (GLOBAL)
+    ============================================================ -->
+    <div id="help-modal" class="help-modal">
+      <div class="help-modal-content">
+        <h3>Dúvidas - Como Usar o Sistema</h3>
+
+        <ul>
+          <li>
+            <strong>Ligar Estufa:</strong> Ativa/desativa iluminação, ventilação
+            e irrigação simultaneamente.
+          </li>
+
+          <li>
+            <strong>Ligar Iluminação:</strong> Controla as luzes internas da
+            estufa.
+          </li>
+
+          <li>
+            <strong>Ligar Ventilação:</strong> Aciona as fans para controle
+            térmico e circulação de ar.
+          </li>
+
+          <li>
+            <strong>Ligar Regadores:</strong> Ativa a irrigação (ciclo máximo:
+            30s por acionamento).
+          </li>
+
+          <li>
+            <strong>Modo Automático:</strong> Gerencia todos os equipamentos com
+            base nos limites configurados.
+          </li>
+
+          <li>
+            <strong>Status & Relatórios:</strong> Mostra dados de sensores em
+            tempo real e gráficos históricos.
+          </li>
+
+          <li>
+            <strong>Baixar Relatório:</strong> Exporta dados em CSV para análise
+            externa.
+          </li>
+        </ul>
+
+        <button id="close-help">Fechar</button>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         TOASTS / CARREGAMENTO
+    ============================================================ -->
     <div id="toast-container"></div>
 
-    <!-- scripts -->
+    <div id="loading-overlay" class="loading-overlay">
+      <div class="loading-spinner"></div>
+      <p>Carregando...</p>
+    </div>
+
+    <!-- ============================================================
+         SCRIPTS
+    ============================================================ -->
     <script src="./main.js"></script>
   </body>
 </html>

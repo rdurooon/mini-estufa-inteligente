@@ -3,21 +3,39 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Estilos -->
     <link rel="stylesheet" href="./style.css" />
-    <title>SIA - Status</title>
+    <link rel="icon" href="./img/favicon.ico" type="image/x-icon" />
+
+    <title>Status da Estufa</title>
   </head>
+
   <body>
+    <!-- ============================================================
+         HEADER / LOGO
+    ============================================================ -->
     <header class="header-logo">
-      <img src="./logo.png" alt="Logo do Projeto" />
+      <img src="./img/logo.png" alt="Logo do Projeto" />
       <span>Painel de Controle</span>
+
+      <button id="btn-help" class="help-button">?</button>
+      <button id="theme-toggle" class="theme-toggle">🌙</button>
     </header>
 
+    <!-- ============================================================
+         MENU DE NAVEGAÇÃO
+    ============================================================ -->
     <nav class="menu">
       <a href="index.html">Controle</a>
       <a href="status.html" class="active">Status & Relatórios</a>
     </nav>
 
+    <!-- ============================================================
+         CONTEÚDO PRINCIPAL
+    ============================================================ -->
     <main class="status-container">
+      <!-- ======================== STATUS EM TEMPO REAL ======================== -->
       <h2>Status da Estufa (Tempo Real)</h2>
 
       <div class="sensor-cards">
@@ -41,13 +59,14 @@
 
         <div class="sensor-card">
           <p>Luminosidade</p>
-          <h1 id="lum-value">-- lx</h1>
+          <h1 id="lum-value">Sem Luz</h1>
           <span class="icon">☀️</span>
         </div>
       </div>
 
       <div class="divider"></div>
 
+      <!-- ======================== RELATÓRIOS E HISTÓRICO ======================== -->
       <section class="reports">
         <h2>Relatórios & Histórico</h2>
 
@@ -61,11 +80,63 @@
           <canvas id="chartGeral"></canvas>
         </div>
 
-        <button id="btn-download-pdf" class="download-btn">
-          Baixar Relatório PDF
+        <button id="btn-download-csv" class="download-btn">
+          Baixar Relatório CSV
         </button>
       </section>
     </main>
+
+    <!-- ============================================================
+         MODAL DE AJUDA
+    ============================================================ -->
+    <div id="help-modal" class="help-modal">
+      <div class="help-modal-content">
+        <h3>Dúvidas - Como Usar o Sistema</h3>
+
+        <ul>
+          <li>
+            <strong>Ligar Estufa:</strong>
+            Ativa/Desativa iluminação, ventilação e irrigação simultaneamente.
+          </li>
+
+          <li>
+            <strong>Ligar Iluminação:</strong>
+            Acende ou apaga as luzes internas da estufa.
+          </li>
+
+          <li>
+            <strong>Ligar Ventilação:</strong>
+            Ativa/desliga as fans responsáveis pela circulação do ar.
+          </li>
+
+          <li>
+            <strong>Ligar Regadores:</strong>
+            Aciona a bomba de irrigação (ciclo máximo de 30s).
+          </li>
+
+          <li>
+            <strong>Modo Automático:</strong>
+            Gerencia os equipamentos com base nos limites configurados.
+          </li>
+
+          <li>
+            <strong>Status & Relatórios:</strong>
+            Exibe dados em tempo real e gráficos históricos (24h / 30 dias).
+          </li>
+
+          <li>
+            <strong>Baixar Relatório:</strong>
+            Salva o histórico em um arquivo CSV para análise externa.
+          </li>
+        </ul>
+
+        <button id="close-help">Fechar</button>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         SCRIPTS
+    ============================================================ -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="./main.js"></script>
   </body>
