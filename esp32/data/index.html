@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="./style.css" />
     <link rel="icon" href="./img/favicon.ico" type="image/x-icon" />
 
-    <title>CONTROLE_ESTUFA</title>
+    <title>SIA - Controle da Estufa</title>
   </head>
 
   <body>
@@ -100,8 +100,11 @@
           value="40"
         />
 
-        <label for="lum-limite">Luminosidade mínima (lx):</label>
-        <input type="number" id="lum-limite" min="0" max="2000" value="300" />
+        <label for="lum-auto-switch">Ligar luz na ausência de luz natural?</label>
+        <select id="lum-auto-switch">
+            <option value="1">Sim, ligar automaticamente</option>
+            <option value="0">Não, manter desligada</option>
+        </select>
 
         <div class="popup-buttons">
           <button id="cancel-popup">Cancelar</button>

@@ -18,7 +18,7 @@
 #define DESLIGA HIGH
 
 // === CONFIGURAÇÕES GERAIS ===
-const char *ssid = "SIA - Sistema inteligente de agricultura";
+const char *ssid = "SIA - Sistema intel. de agricultura";
 const char *password = "sia12345";
 IPAddress local_IP(192, 168, 4, 1);
 IPAddress gateway(192, 168, 4, 1);
@@ -127,9 +127,9 @@ void logicaControle() {
     }
 
     // 3. Controle de Luminosidade (Lâmpada)
-    if (luxSimulado < lumMin_SP) { 
+    if (luxSimulado > lumMin_SP) { 
         setLampada(1);
-    } else if (luxSimulado > lumMin_SP + 50) { 
+    } else if (luxSimulado < lumMin_SP + 50) { 
         setLampada(0);
     }
 }
@@ -196,7 +196,14 @@ void handleCommand() {
         } else if (modo == "auto") {
             tempMax_SP = server.arg("temp").toFloat();
             umidadeMin_SP = server.arg("solo").toFloat();
-            lumMin_SP = server.arg("lux").toInt();
+
+            int flagLuz = server.arg("lux").toInt();   
+            if (flagLuz == 1) {
+                lumMin_SP = 250;
+            } else {
+                lumMin_SP = 9999;   
+            }
+            
             modoAutomatico = true;
             server.send(200, "text/plain", "Modo Automatico Ativado e SPs Salvos.");
         }

@@ -13,9 +13,9 @@ let modoAutomatico = localStorage.getItem("modoAutomatico") === "true";
 let parametrosAutomatico = JSON.parse(
   localStorage.getItem("parametrosAutomatico")
 ) || {
-  tempMax: 28,
-  umidSoloMin: 40,
-  lumMin: 300,
+  tempMax: 35,
+  umidSoloMin: 50,
+  lumMin: 1,
 };
 
 // Endereço IP do ESP32 (ajuste conforme sua rede / modo AP)
@@ -153,7 +153,7 @@ function inicializarModoAutomatico() {
       // Preenche os inputs com os setpoints atuais
       const tempInput = document.getElementById("temp-limite");
       const soloInput = document.getElementById("umid-solo-limite");
-      const lumInput = document.getElementById("lum-limite");
+      const lumInput = document.getElementById("lum-auto-switch");
       if (tempInput) tempInput.value = parametrosAutomatico.tempMax;
       if (soloInput) soloInput.value = parametrosAutomatico.umidSoloMin;
       if (lumInput) lumInput.value = parametrosAutomatico.lumMin;
@@ -163,6 +163,11 @@ function inicializarModoAutomatico() {
       // usuário desativou o switch: envia modo manual ao ESP e aplica DOM
       enviarModo("manual");
       modoAutomatico = false;
+
+      desligarEquipamento("fans", "Ventilação");
+      desligarEquipamento("regar", "Regadores");
+      desligarEquipamento("luz", "Iluminação");
+
       localStorage.setItem("modoAutomatico", "false");
       aplicarManualDOM();
       mostrarToast("Modo Automático desativado", "alert");
@@ -196,14 +201,14 @@ function inicializarModoAutomatico() {
         document.getElementById("umid-solo-limite")?.value ?? parametrosAutomatico.umidSoloMin
       );
       const lumVal = parseFloat(
-        document.getElementById("lum-limite")?.value ?? parametrosAutomatico.lumMin
+        document.getElementById("lum-auto-switch")?.value ?? parametrosAutomatico.lumMin,
       );
 
       // Atualiza setpoints locais e persiste
       parametrosAutomatico = {
         tempMax: Number.isFinite(tempVal) ? tempVal : parametrosAutomatico.tempMax,
         umidSoloMin: Number.isFinite(soloVal) ? soloVal : parametrosAutomatico.umidSoloMin,
-        lumMin: Number.isFinite(lumVal) ? lumVal : parametrosAutomatico.lumMin,
+        lumMin: lumVal,
       };
 
       localStorage.setItem("parametrosAutomatico", JSON.stringify(parametrosAutomatico));
@@ -226,42 +231,33 @@ function inicializarModoAutomatico() {
    5. BOTÕES (index.html) — controle manual e master
 ============================================================ */
 
-function configurarBotao(id, nome, idEstado, txtOn, txtOff) {
+function configurarBotao(id, nome) {
   const chave = id.split("-")[1];
   const btn = document.getElementById(id);
-  const estado = document.getElementById(idEstado);
-
-  if (!btn || !estado) return;
+  if (!btn) return;
 
   btn.addEventListener("click", () => {
     if (modoAutomatico) {
-      mostrarToast(`Desative o Modo Automático para controle manual de ${nome}.`, "alert");
+      mostrarToast(`Desative o Modo Automático para controlar ${nome}.`, "alert");
       return;
     }
-
+    
     mostrarCarregamento();
-    setTimeout(() => {
-      estadosBotoes[chave] = !estadosBotoes[chave];
-      const ligado = estadosBotoes[chave];
 
-      // Envia comando real para o ESP e atualiza UI
-      enviarComando(chave, ligado);
-      atualizarAtuadorUI(chave, ligado ? 1 : 0);
+    // PEGA O ESTADO ATUAL PELA CLASSE CSS (Mais confiável que o cache de variável)
+    const estaLigado = btn.classList.contains("on");
+    const novoEstado = !estaLigado; 
 
-      if (!estadosBotoes.luz && !estadosBotoes.fans && !estadosBotoes.regar) {
-        estadosBotoes.master = false;
+    // Envia o comando para o ESP32
+    enviarComando(chave, novoEstado);
 
-        const btnMaster = document.getElementById("btn-estufa-master");
-        if (btnMaster) {
-          btnMaster.textContent = "Ligar Estufa";
-          btnMaster.classList.remove("on");
-          btnMaster.classList.add("off");
-        }
-      }
+    // ATUALIZAÇÃO IMEDIATA DO CACHE LOCAL (Resolve o bug de não desligar)
+    estadosBotoes[chave] = novoEstado;
 
-      mostrarToast(`${nome} ${ligado ? "ligada" : "desligada"}.`);
-      esconderCarregamento();
-    }, 1200);
+    // Atualiza a interface visual IMEDIATAMENTE (Feedback de UX)
+    atualizarAtuadorUI(chave, novoEstado ? 1 : 0);
+
+    setTimeout(esconderCarregamento, 500);
   });
 }
 
@@ -366,8 +362,11 @@ function atualizarUIComDados(data) {
   if (tempEl) tempEl.textContent = `${data.temperatura} °C`;
   if (umArEl) umArEl.textContent = `${data.umidadeAr} %`;
   if (umSoloEl) umSoloEl.textContent = `${data.umidadeSolo} %`;
-  if (lumEl)
-    lumEl.textContent = data.luminosidade < limitLuxUI ? "Sem luz" : "Com luz";
+  if (lumEl) {
+    // Exibe "Com/Sem luz" baseado no limite, e mostra o valor bruto (raw) ao lado
+    const statusLuz = data.luminosidade > limitLuxUI ? "Sem luz" : "Com luz";
+    lumEl.textContent = `${statusLuz} (${data.luminosidade})`;
+  }
 }
 
 function limparUIFalhaESP() {
@@ -394,14 +393,16 @@ function verificarModoAutomatico(data) {
       `Ventilação ativada — temperatura acima do limite (${tempMax}°C).`,
       "success"
     );
+    atualizarAtuadorUI("fans", 1);
   } else if (data.temperatura < tempMax - 1) {
     desligarEquipamento("fans", "Ventilação");
     mostrarToast(
       `Ventilação desativada — temperatura dentro do intervalo.`,
       "success"
     );
+    atualizarAtuadorUI("fans", 0);
   }
-
+  
   // Umidade do solo -> regar
   if (data.umidadeSolo < umidSoloMin - 2) {
     ligarEquipamento("regar", "Regadores");
@@ -409,21 +410,35 @@ function verificarModoAutomatico(data) {
       `Irrigação ativada — umidade do solo abaixo do mínimo (${umidSoloMin}%).`,
       "success"
     );
+    atualizarAtuadorUI("regar", 1);
   } else if (data.umidadeSolo > umidSoloMin + 2) {
     desligarEquipamento("regar", "Regadores");
     mostrarToast(`Irrigação desativada — umidade do solo adequada.`, "success");
+    atualizarAtuadorUI("regar", 0);
   }
-
+  
   // Luminosidade -> luz
-  if (data.luminosidade < lumMin - 20) {
-    ligarEquipamento("luz", "Iluminação");
-    mostrarToast(
-      `Iluminação acionada — luminosidade abaixo do limite configurado (${lumMin} lx).`,
-      "success"
-    );
-  } else if (data.luminosidade > lumMin + 20) {
-    desligarEquipamento("luz", "Iluminação");
-    mostrarToast(`Iluminação desligada — luminosidade suficiente.`, "success");
+  if (Number(lumMin) === 1) { 
+    // Se o valor for MAIOR que 250 (Escuro detectado pelo hardware)
+    if (data.luminosidade > limitLuxUI) {
+      if (!estadosBotoes.luz) {
+        // Envia o comando real de ligar para o ESP32
+        ligarEquipamento("luz", "Iluminação");
+        mostrarToast("Escuridão detectada. Luz ligada.", "success");
+        atualizarAtuadorUI("luz", 1);
+      }
+    } else {
+      // Se o valor for MENOR que 250 (Claro)
+      if (estadosBotoes.luz) {
+        // Envia o comando real de desligar para o ESP32
+        desligarEquipamento("luz", "Iluminação");
+        mostrarToast("Luz natural detectada. Luz desligada.", "success");
+        atualizarAtuadorUI("luz", 0);
+      }
+    }
+  } else {
+    // Se o usuário selecionou 'Não', garante que a luz apague se estivesse acesa
+    if (estadosBotoes.luz) desligarEquipamento("luz", "Iluminação");
   }
 }
 
@@ -491,23 +506,30 @@ async function enviarModo(modo, params = null) {
 
 function atualizarAtuadorUI(atuador, estado) {
   const btn = document.getElementById(`btn-${atuador}`);
-  const estadoElemento = document.getElementById(`state-${atuador}`);
-
-  // Se não existir no mapa, tenta ajustar visual com nome direto
+  const statusIndicator = document.getElementById(`state-${atuador}`);
+  const ligado = (estado === 1);
   const nome = ATUADORES[atuador] ? ATUADORES[atuador].nome : atuador;
 
   if (btn) {
-    const ligado = estado === 1;
     btn.textContent = ligado ? `Desligar ${nome}` : `Ligar ${nome}`;
-    btn.classList.toggle("on", ligado);
-    btn.classList.toggle("off", !ligado);
+    if (ligado) {
+      btn.classList.replace("off", "on") || btn.classList.add("on");
+    } else {
+      btn.classList.replace("on", "off") || btn.classList.add("off");
+    }
+    estadosBotoes[atuador] = ligado; // Sincroniza o cache global
   }
-
-  if (estadoElemento) {
-    const ligado = estado === 1;
-    estadoElemento.textContent = ligado ? "Ligada" : "Desligada";
-    estadoElemento.classList.toggle("on", ligado);
-    estadoElemento.classList.toggle("off", !ligado);
+  
+  if (statusIndicator) {
+    statusIndicator.textContent = ligado ? "Ligada" : "Desligada";
+    // Força a atualização das cores no texto de Status Atual
+    if (ligado) {
+        statusIndicator.classList.remove("off");
+        statusIndicator.classList.add("on");
+    } else {
+        statusIndicator.classList.remove("on");
+        statusIndicator.classList.add("off");
+    }
   }
 }
 
@@ -531,7 +553,10 @@ async function obterDados() {
     // Atualiza setpoints locais se o ESP32 reportar
     if (dados.temp_sp !== undefined) parametrosAutomatico.tempMax = Number(dados.temp_sp);
     if (dados.um_solo_sp !== undefined) parametrosAutomatico.umidSoloMin = Number(dados.um_solo_sp);
-    if (dados.lum_sp !== undefined) parametrosAutomatico.lumMin = Number(dados.lum_sp);
+    if (dados.lum_sp !== undefined) {
+      const valorHardware = Number(dados.lum_sp);    
+      parametrosAutomatico.lumMin = (valorHardware === 1 || valorHardware > 10) ? 1 : 0;
+    }
 
     if (window.adicionarDadoHistorico) {
     window.adicionarDadoHistorico(payload);

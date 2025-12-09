@@ -459,6 +459,20 @@ input:checked + .slider:before {
   border: 1px solid #ccc;
 }
 
+.popup-content select {
+  width: 100%;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background-color: #fff; /* Fundo branco fixo */
+  font-family: inherit;
+  font-size: 14px;
+  color: #333;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
 .popup-buttons {
   display: flex;
   justify-content: flex-end;
